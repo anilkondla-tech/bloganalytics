@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WordPress Blog Analytics</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <h1>WordPress Blog Analytics</h1>
+        <p>Connected to: {{ db_connection }}</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="top-cards" id="summary-cards"></section>
+
+      <section class="charts-grid">
+        <article class="chart-card">
+          <h2>Posts by Status</h2>
+          <canvas id="postStatusChart"></canvas>
+        </article>
+        <article class="chart-card">
+          <h2>Posts in Last 30 Days</h2>
+          <canvas id="recentPostsChart"></canvas>
+        </article>
+        <article class="chart-card">
+          <h2>Top Categories</h2>
+          <canvas id="categoriesChart"></canvas>
+        </article>
+      </section>
+
+      <section class="tables-grid">
+        <article>
+          <h2>Recent Posts</h2>
+          <div class="table-container">
+            <table id="recent-posts-table">
+              <thead>
+                <tr><th>ID</th><th>Title</th><th>Date</th><th>Status</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+        <article>
+          <h2>Comments by Status</h2>
+          <div class="table-container">
+            <table id="comments-status-table">
+              <thead><tr><th>Status</th><th>Count</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const numberFormatter = new Intl.NumberFormat('en-US');
+
+      async function loadSummary() {
+        const response = await fetch('/api/summary');
+        if (!response.ok) {
+          document.body.innerHTML = '<div class="error">Unable to load dashboard. Check database connection.</div>';
+          return;
+        }
+        return response.json();
+      }
+
+      function createChart(elementId, type, labels, data, label) {
+        const context = document.getElementById(elementId).getContext('2d');
+        return new Chart(context, {
+          type,
+          data: {
+            labels,
+            datasets: [{ label, data, backgroundColor: ['#4E79A7', '#F28E2B', '#E15759', '#76B7B2', '#59A14F', '#EDC948', '#B07AA1', '#FF9DA7'], borderWidth: 1 }],
+          },
+          options: { responsive: true, maintainAspectRatio: false },
+        });
+      }
+
+      function renderTable(tableId, rows, columns) {
+        const tbody = document.querySelector(`${tableId} tbody`);
+        tbody.innerHTML = '';
+        rows.forEach((row) => {
+          const tr = document.createElement('tr');
+          columns.forEach((column) => {
+            const td = document.createElement('td');
+            td.textContent = row[column] ?? '';
+            tr.append(td);
+          });
+          tbody.append(tr);
+        });
+      }
+
+      function renderSummaryCards(summary) {
+        const container = document.getElementById('summary-cards');
+        const cards = [
+          { title: 'Total Posts', value: numberFormatter.format(summary.total_posts) },
+          { title: 'Total Comments', value: numberFormatter.format(summary.total_comments) },
+          { title: 'Authors', value: numberFormatter.format(summary.author_summary.length) },
+          { title: 'Recent Posts', value: numberFormatter.format(summary.recent_posts.length) },
+        ];
+        container.innerHTML = cards.map(card => `
+          <div class="summary-card">
+            <strong>${card.title}</strong>
+            <span>${card.value}</span>
+          </div>
+        `).join('');
+      }
+
+      function buildChartData(summary, labelKey, valueKey) {
+        return {
+          labels: summary.map((item) => item[labelKey] || 'Unknown'),
+          data: summary.map((item) => Number(item[valueKey]) || 0),
+        };
+      }
+
+      loadSummary().then((summary) => {
+        if (!summary) return;
+        renderSummaryCards(summary);
+        renderTable('#recent-posts-table', summary.recent_posts, ['post_id', 'post_title', 'post_date', 'post_status']);
+        renderTable('#comments-status-table', summary.comments_by_status, ['status', 'count']);
+
+        const postStatusData = buildChartData(summary.status_summary, 'status', 'count');
+        createChart('postStatusChart', 'doughnut', postStatusData.labels, postStatusData.data, 'Posts by Status');
+
+        const recentTimeline = buildChartData(summary.posts_last_30_days, 'day', 'count');
+        createChart('recentPostsChart', 'line', recentTimeline.labels, recentTimeline.data, 'Posts per Day');
+
+        const categoryData = buildChartData(summary.category_summary, 'category', 'count');
+        createChart('categoriesChart', 'bar', categoryData.labels, categoryData.data, 'Top Categories');
+      });
+    </script>
+  </body>
+</html>

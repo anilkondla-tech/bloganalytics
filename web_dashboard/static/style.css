@@ -1,0 +1,130 @@
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f5f7fb;
+  color: #222;
+}
+
+header {
+  background: linear-gradient(135deg, #2f80ed, #56ccf2);
+  color: white;
+  padding: 1.5rem 1.25rem;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+}
+
+header p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+main {
+  max-width: 1200px;
+  margin: 1.5rem auto 2rem;
+  padding: 0 1.25rem;
+}
+
+.top-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+  padding: 1.25rem;
+}
+
+.summary-card strong {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #4f46e5;
+}
+
+.summary-card span {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.25rem;
+  min-height: 340px;
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+}
+
+.chart-card h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  height: calc(100% - 40px) !important;
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.08);
+}
+
+thead {
+  background: #eef2ff;
+}
+
+th, td {
+  padding: 0.95rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.error {
+  color: #b91c1c;
+  padding: 2rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+@media (max-width: 950px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
