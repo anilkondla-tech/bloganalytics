@@ -1,3 +1,4 @@
+import "./env"; // load shared bloganalytics/.env before reading process.env
 import type { SiteMeta } from "./types";
 
 export type SiteConnection = SiteMeta & {
@@ -15,15 +16,30 @@ function clean(value: string | undefined, fallback = ""): string {
 }
 
 function siteKeys(): string[] {
-  const raw = clean(process.env.THINKGRAPH_SITES, "techsprohub");
-  return raw
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  // 1. Explicit allow-list wins.
+  const raw = clean(process.env.THINKGRAPH_SITES);
+  if (raw) {
+    return raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  // 2. Otherwise discover every site that has a SITE_<KEY>_HOST defined
+  //    (matches the shared bloganalytics/.env layout).
+  const discovered: string[] = [];
+  for (const key of Object.keys(process.env)) {
+    const m = key.match(/^SITE_(.+)_HOST$/);
+    if (m) discovered.push(m[1].toLowerCase());
+  }
+  if (discovered.length) return Array.from(new Set(discovered)).sort();
+  // 3. Fallback.
+  return ["techsprohub"];
 }
 
 export function getDefaultSiteKey(): string {
-  const def = clean(process.env.THINKGRAPH_DEFAULT_SITE);
+  const def =
+    clean(process.env.THINKGRAPH_DEFAULT_SITE) ||
+    clean(process.env.DASHBOARD_DEFAULT_SITE);
   const keys = siteKeys();
   if (def && keys.includes(def)) return def;
   return keys[0] ?? "techsprohub";

@@ -12,10 +12,10 @@ next-env.d.ts
 # production
 /build
 
-# secrets — NEVER commit real credentials
+# secrets — NEVER commit real credentials.
+# .env.example holds the real (MVP) creds and is intentionally ignored too.
 .env
 .env.*
-!.env.example
 
 # vercel
 .vercel
