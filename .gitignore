@@ -5,26 +5,28 @@ env/
 ENV/
 *.venv
 
-# Python
+# Python (anchored to repo root so these generic names can't match
+# nested app folders like thinkgraph/src/lib — that bug silently dropped
+# the Next.js data layer from the first push)
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
+/build/
+/develop-eggs/
+/dist/
+/downloads/
+/eggs/
+/.eggs/
+/lib/
+/lib64/
+/parts/
+/sdist/
+/var/
+/wheels/
+/pip-wheel-metadata/
+/share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -62,3 +64,7 @@ next-env.d.ts
 # OS
 .DS_Store
 Thumbs.db
+
+# Safety net: always track the Next.js app source, whatever the rules above say
+!thinkgraph/src/
+!thinkgraph/src/**
