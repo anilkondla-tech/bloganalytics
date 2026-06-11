@@ -38,8 +38,21 @@ MANIFEST
 *~
 .DS_Store
 
-# Environment variables
+# Environment variables / secrets (NEVER commit real credentials)
+.env
+.env.*
+!.env.example
+*.creds
+blog_db.sql
+localdb_creds.sql
 
+# Node / Next.js (thinkgraph app)
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
 
 # Database
 *.db
